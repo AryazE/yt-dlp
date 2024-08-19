@@ -6,7 +6,6 @@ permissions:
 jobs:
   tests:
     name: Core Test
-    if: "!contains(github.event.head_commit.message, 'ci skip all')"
     runs-on: ubuntu-latest
     steps:
     - uses: actions/checkout@v4
@@ -16,7 +15,12 @@ jobs:
         python-version: '3.10'
     - name: Install test requirements
       run: python3 ./devscripts/install_deps.py --include test
+    - name: Instrument code
+      uses: AryazE/auto-dylin/instrument@main
     - name: Run tests
       run: |
         python3 -m yt_dlp -v || true
         python3 ./devscripts/run_tests.py core
+    - name: Report results
+      if: always()
+      uses: AryazE/auto-dylin/report@main
